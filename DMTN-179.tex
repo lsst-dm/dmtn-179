@@ -3,14 +3,20 @@
 \input{meta}
 
 % Package imports go here.
-
+\usepackage{physics}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{cleveref}
+\usepackage{afterpage}
 % Local commands go here.
 
 %If you want glossaries
 %\input{aglossary.tex}
 %\makeglossaries
 
-\title{The ZOGY image differencing kernel and PSF solutions and some practical implementation issues}
+\title{The ZOGY image differencing matching kernel and PSF solutions
+  and their practical implementation issues}
 
 % Optional subtitle
 % \setDocSubtitle{A subtitle}
@@ -27,18 +33,19 @@ Gabor Kovacs
 % Optional: name of the document's curator
 % \setDocCurator{The Curator of this Document}
 
-\setDocAbstract{%
-We present the ideal matching kernel and PSF solutions for Gaussian input PSFs in the ZOGY image matching, noise decorrelation and subtraction method. We discuss sources of numerical noise in Fourier-space that can lead to spatially badly bound image artefacts in the difference images.
-}
+\setDocAbstract{% We present the ideal matching kernel and PSF
+  solutions for Gaussian input PSFs in the ZOGY image matching, noise
+  decorrelation and subtraction method. We discuss sources of
+  numerical noise in Fourier-space calculations that can lead to
+  spatially badly bound image artifacts in the difference images.}
 
 % Change history defined here.
 % Order: oldest first.
 % Fields: VERSION, DATE, DESCRIPTION, OWNER NAME.
 % See LPM-51 for version number policy.
 \setDocChangeRecord{%
-  \addtohist{1}{YYYY-MM-DD}{Unreleased.}{Gabor Kovacs}
+  \addtohist{1}{2021-02-01}{Initial release.}{Gabor Kovacs}
 }
-
 
 \begin{document}
 
@@ -49,8 +56,9 @@ We present the ideal matching kernel and PSF solutions for Gaussian input PSFs i
 
 % ADD CONTENT HERE
 % You can also use the \input command to include several content files.
-
+\input{zogy_main}
 \appendix
+\input{zogy_appendix}
 % Include all the relevant bib files.
 % https://lsst-texmf.lsst.io/lsstdoc.html#bibliographies
 \section{References} \label{sec:bib}
