@@ -22,7 +22,7 @@
 % \setDocSubtitle{A subtitle}
 
 \author{%
-Gabor Kovacs
+G\'abor Kov\'acs
 }
 
 \setDocRef{DMTN-179}
@@ -33,11 +33,14 @@ Gabor Kovacs
 % Optional: name of the document's curator
 % \setDocCurator{The Curator of this Document}
 
-\setDocAbstract{% We present the ideal matching kernel and PSF
+\setDocAbstract{We present the ideal matching kernel and PSF
   solutions for Gaussian input PSFs in the ZOGY image matching, noise
   decorrelation and subtraction method. We discuss sources of
   numerical noise in Fourier-space calculations that can lead to
-  spatially badly bound image artifacts in the difference images.}
+  spatially badly bound image artifacts in the difference images. We
+  briefly study the connection between the Alard-Lupton PSF
+  matching with the decorrelation afterburner and the ZOGY
+  subtraction methods.}
 
 % Change history defined here.
 % Order: oldest first.
@@ -45,6 +48,7 @@ Gabor Kovacs
 % See LPM-51 for version number policy.
 \setDocChangeRecord{%
   \addtohist{1}{2021-02-01}{Initial release.}{Gabor Kovacs}
+  \addtohist{1.1}{2021-03-10}{Fix abstract. Expand the discussion about the decorrelation afterburner.}{Gabor Kovacs}
 }
 
 \begin{document}
@@ -70,9 +74,5 @@ Gabor Kovacs
 \input{acronyms.tex}
 % If you want glossary uncomment below -- comment out the two lines above
 %\printglossaries
-
-
-
-
 
 \end{document}
