@@ -475,19 +475,19 @@ the variance plane of S can be calculated this way as well.
 \par In \Cref{eq:DzPz}, we write the ZOGY score image in frequency
 space and expand the expression to demonstrate that the AL matching
 and subtraction combined with the decorrelation afterburner noise
-whitening theoretically leads to the same detection statistics.  In the
-AL case the role of the two images are not symmetric, the template PSF
-is matched to the science image, and the science image is left
+whitening theoretically leads to the same detection statistics.  In
+the AL case the role of the two images are not symmetric, the template
+PSF is matched to the science image, and the science image is left
 intact. Assuming that the AL optimization finds the perfect matching
-kernel, it should be \(P_n/P_r\).  Indeed, considering the score
-image, the difference between the AL and ZOGY images are only a factor
-of \(\hat{P}_r/\abs{\hat{P}_r}\). Compared to the AL, in the ZOGY case
-both the difference image and its PSF carry an extra
+kernel, it should be \(\hat{P}_n/\hat{P}_r\). Indeed, considering the
+score image, the difference between the AL and ZOGY images are only a
+factor of \(\hat{P}_r/\abs{\hat{P}_r}\). Compared to the AL, in the
+ZOGY case both the difference image and its PSF carry an extra
 \(\hat{P}_{pre}/\abs{\hat{P}_{pre}}\) factor that cancel from the
 overall expression of the score image. Indeed, as
-\(\overline{\hat{P}_r}\hat{P}_r/\abs{\hat{P}_r}^2 = 1\), this factor
-can be arbitrarily added to or removed from the difference image
-and PSF terms without changing the resulting score image.
+\(\overline{\hat{P}_r}\hat{P}_r/\abs{\hat{P}_r}^2 = 1\), we can reduce
+or expand this factor in the difference image and its PSF terms
+without changing their resulting product, the score image.
 %
 \par Furthermore, note that \(\hat{P}_r\) from the AL perspective can
 be treated as an optional \emph{pre-convolution} kernel for the
@@ -528,11 +528,15 @@ F_D = \frac{1}{\sqrt{\frac{\sigma_n^2}{F_n^2} + \frac{\sigma_r^2}{F_r^2}}}
   {\sqrt{\frac{\sigma_n^2}{F_n^2} +
       \frac{\sigma_r^2}{F_r^2}\abs{\frac{\hat{P}_n}{\hat{P}_r}}^2}}
   \cdot
+  \underbrace{
   \frac{\hat{P}_r}{\abs{\hat{P}_r}}
   \cdot
-  \frac{\overline{\hat{P}_n\hat{P}_r}\sqrt{\frac{\sigma_n^2}{F_n^2} + \frac{\sigma_r^2}{F_r^2}}}
-  {\sqrt{\frac{\sigma_n^2}{F_n^2}\abs{\hat{P}_r}^2 +
-      \frac{\sigma_r^2}{F_r^2}\abs{\hat{P}_n}^2}} = \\
+  \frac{\overline{\hat{P}_r}}{\abs{\hat{P}_r}}
+  }_{1} % underbrace
+  \cdot
+  \frac{\overline{\hat{P}_n}\sqrt{\frac{\sigma_n^2}{F_n^2} + \frac{\sigma_r^2}{F_r^2}}}
+  {\sqrt{\frac{\sigma_n^2}{F_n^2} +
+      \frac{\sigma_r^2}{F_r^2}\frac{\abs{\hat{P}_n}^2}{\abs{\hat{P}_r}^2}}} = \\
   &= F_D \hat{D}_{AL} \cdot \frac{\overline{\hat{P}_n}
   \sqrt{\frac{\sigma_n^2}{F_n^2} + \frac{\sigma_r^2}{F_r^2}}}
   {\sqrt{\frac{\sigma_n^2}{F_n^2} +
