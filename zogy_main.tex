@@ -471,6 +471,32 @@ frequency space calculations).
 the variance plane of S can be calculated this way as well.
 %
 \section{ZOGY and AL equivalence\label{sec:ALZOGYequiv}}
+\par The classic AL algorithm matches the reference image to the new
+science image by convolving it with a matching kernel. In frequency
+space, the matching kernel is ideally the quotient of the two image
+PSFs (\Cref{eq:Dal}).
+%
+\begin{equation}
+  \hat{D}_{AL} =
+  \frac{\hat{P}_{pre}}{F_n}\hat{N} -
+    \frac{\hat{P}_{mk}}{F_r}\hat{R}
+  =
+  \frac{\hat{P}_{pre}\hat{N}}{F_n} -
+    \frac{\hat{P}_n\hat{P}_{pre}\hat{R}}{\hat{P}_r F_r}
+                 \label{eq:Dal}
+\end{equation}
+%
+\par The decorrelation afterburner is a correction, applied in frequency
+space onto the difference image (\Cref{eq:K}) to whiten the noise in
+image space.
+%
+\begin{align}
+\hat{K}  &= \frac
+  {1}
+  {\sqrt{\frac{\sigma_n^2}{F_n^2}\abs{\hat{P}_{pre}}^2 +
+      \frac{\sigma_r^2}{F_r^2}\abs{\hat{P}_{mk}}^2}}
+  \sqrt{\frac{\sigma_n^2}{F_n^2} + \frac{\sigma_r^2}{F_r^2}}\label{eq:K}
+\end{align}
 %
 \par In \Cref{eq:DzPz}, we write the ZOGY score image in frequency
 space and expand the expression to demonstrate that the AL matching
@@ -485,9 +511,10 @@ factor of \(\hat{P}_r/\abs{\hat{P}_r}\). Compared to the AL, in the
 ZOGY case both the difference image and its PSF carry an extra
 \(\hat{P}_{pre}/\abs{\hat{P}_{pre}}\) factor that cancel from the
 overall expression of the score image. Indeed, as
-\(\overline{\hat{P}_r}\hat{P}_r/\abs{\hat{P}_r}^2 = 1\), we can reduce
-or expand this factor in the difference image and its PSF terms
-without changing their resulting product, the score image.
+\(\overline{\hat{P}_r}\hat{P}_r/\abs{\hat{P}_r}^2 = 1\) at all
+frequencies, we can reduce or expand this factor in the difference
+image and its PSF terms without changing their resulting product, the
+score image.
 %
 \par Furthermore, note that \(\hat{P}_r\) from the AL perspective can
 be treated as an optional \emph{pre-convolution} kernel for the
@@ -537,41 +564,57 @@ F_D = \frac{1}{\sqrt{\frac{\sigma_n^2}{F_n^2} + \frac{\sigma_r^2}{F_r^2}}}
   \frac{\overline{\hat{P}_n}\sqrt{\frac{\sigma_n^2}{F_n^2} + \frac{\sigma_r^2}{F_r^2}}}
   {\sqrt{\frac{\sigma_n^2}{F_n^2} +
       \frac{\sigma_r^2}{F_r^2}\frac{\abs{\hat{P}_n}^2}{\abs{\hat{P}_r}^2}}} = \\
-  &= F_D \hat{D}_{AL} \cdot \frac{\overline{\hat{P}_n}
+  &= F_D \hat{D}_{AL+d} \cdot \frac{\overline{\hat{P}_n}
   \sqrt{\frac{\sigma_n^2}{F_n^2} + \frac{\sigma_r^2}{F_r^2}}}
   {\sqrt{\frac{\sigma_n^2}{F_n^2} +
       \frac{\sigma_r^2}{F_r^2}\abs{\frac{\hat{P}_n}{\hat{P}_r}}^2}} =
-F_D \hat{D}_{AL}\overline{\hat{P}_{AL}}
+F_D \hat{D}_{AL+d}\overline{\hat{P}_{AL+d}}
 \label{eq:DalDzPrPr}
 \end{align}
 %
 \begin{equation}
-\hat{D}_{AL} = \frac{\hat{D}_Z}{F_D}\cdot\frac{\abs{\hat{P}_r}}{\hat{P}_r}
+\hat{D}_{AL+d} = \frac{\hat{D}_Z}{F_D}\cdot\frac{\abs{\hat{P}_r}}{\hat{P}_r}
 \end{equation}
 %
 \begin{align}
-  \hat{D}_{AL} &= \frac
+  \hat{D}_{AL+d} =  \hat{D}_{AL} \cdot \hat{K}  &= \frac
   {\frac{\hat{P}_{pre}\hat{N}}{F_n} -
     \frac{\hat{P}_n\hat{P}_{pre}\hat{R}}{\hat{P}_r F_r} }
   {\sqrt{\frac{\sigma_n^2}{F_n^2}\abs{\hat{P}_{pre}}^2 +
       \frac{\sigma_r^2}{F_r^2}\abs{\frac{\hat{P}_n\hat{P}_{pre}}{\hat{P}_r}}^2}}
   \sqrt{\frac{\sigma_n^2}{F_n^2} + \frac{\sigma_r^2}{F_r^2}}
-                 \label{eq:DalPre}
+  \label{eq:DalPre}\\
+%
+  &= \frac
+  {\frac{\hat{P}_{pre}}{F_n}\hat{N} -
+    \frac{\hat{P}_{mk}}{F_r}\hat{R} }
+  {\sqrt{\frac{\sigma_n^2}{F_n^2}\abs{\hat{P}_{pre}}^2 +
+      \frac{\sigma_r^2}{F_r^2}\abs{\hat{P}_{mk}}^2}}
+  \sqrt{\frac{\sigma_n^2}{F_n^2} + \frac{\sigma_r^2}{F_r^2}}\label{eq:DaldPreMk}
 \end{align}
 %
-\section{Decorrelation afterburner normalization}
-\par To preserve the photometric scale of the AL difference
-image (that is the same of the science image), the decorrelation
-afterburner correction should be overall a convolution with a
-normalized correction kernel (in image space). PSF normalization can
-be easily ensured in frequency space. If we evaluate any PSF at 0,
+\section{The decorrelation afterburner}
+The decorrelation afterburner was created as a post-processing
+correctional step on the difference image. Let's consider the without
+pre-convolution kernel case first ((\hat{P}_{pre}=1\) at all frequencies) 
+%Note: looks like c_2 the
+We expect high frequency noise in the science image convolution case
+when \(\sigma_r \gg \sigma_n\) can happen. In this case the numerical
+noise in the tails of \(\hat{P}_{mk}\) is amplified and \(\hat{K}\)
+may not converge to its high frequency constant limit value (\(F_n/\sigma_n\)).
+The practical problem with using the two-kernel ( decorrelation afterburner is exactly the same as the calculation of the ZOGY difference image 
+% 
+\subsection{Decorrelation afterburner normalization}
+\par To preserve the photometric scale of the AL difference image
+(that is the same of the science image), the decorrelation afterburner
+correction should be overall a convolution with a normalized
+correction kernel (in image space). PSF normalization can be easily
+ensured in frequency space. If we evaluate any PSF at 0 frequency,
 based on \Cref{eq:X0sum} they should give 1. The AL matching kernel is
 not constrained this way in general. The sum of the AL matching kernel
 and the optional pre-convolution kernel can be written as separate
 factors in the decorrelation afterburner. The correctly normalized
-decorrelation afterburner is written in \Cref{eq:KPre}.\footnote{As of
-  writing this is not implemented in the LSST stack correctly. It is
-  DM-25050.}
+decorrelation afterburner is written in \Cref{eq:KPre}.
 %
 \begin{align}
   \hat{K} &= \frac{\sqrt{\frac{\sigma_n^2}{F_n^2}S_{pre}^2 + \frac{\sigma_r^2}{F_r^2}S_{mk}^2}}
@@ -579,6 +622,21 @@ decorrelation afterburner is written in \Cref{eq:KPre}.\footnote{As of
   \abs{\hat{P}_{mk}}^2}}
 \label{eq:KPre}
 \end{align}
+\subsection{Proposed fusion of AL with ZOGY}
+To keep the advantage of AL not assuming a prior knowledge of the
+image PSFs and of ZOGY to produce a proper difference image, we
+propose the following algorithmic fusion of the two approaches. Use AL
+with an suitably chosen pre-convolution kernel to determine
+\(P_{pre}\), \(P_{mk}\) in image space, perhaps in a spatially varying
+manner for the whole image. This optimisation can focus solely on the
+quality of the matching kernel solution. The AL difference image in
+its original \Cref{eq:Dal} form needn't be calculated. In the next
+step, using \Cref{eq:DaldPreMk}, we perform a ZOGY difference image
+calculation using \(\hat{P}_{pre}\) and \(\hat{P}_{mk}\) like the
+``image PSFs'' with all the precautions and numerical considerations
+discussed earlier. If \(\hat{P}_{pre}\) is positive and real (as it is
+in the case of a Gaussian PSF), it disappears completely from the
+expression.
 %
 \section{Conclusions}
 %
