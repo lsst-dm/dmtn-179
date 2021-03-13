@@ -573,7 +573,7 @@ F_D \hat{D}_{AL+d}\overline{\hat{P}_{AL+d}}
 \end{align}
 %
 \begin{equation}
-\hat{D}_{AL+d} = \frac{\hat{D}_Z}{F_D}\cdot\frac{\abs{\hat{P}_r}}{\hat{P}_r}
+\hat{D}_{AL+d} = \frac{\hat{D}_Z}{_D}\cdot\frac{\abs{\hat{P}_r}}{\hat{P}_r}
 \end{equation}
 %
 \begin{align}
@@ -595,14 +595,32 @@ F_D \hat{D}_{AL+d}\overline{\hat{P}_{AL+d}}
 %
 \section{The decorrelation afterburner}
 The decorrelation afterburner was created as a post-processing
-correctional step on the difference image. Let's consider the without
-pre-convolution kernel case first ((\hat{P}_{pre}=1\) at all frequencies) 
-%Note: looks like c_2 the
-We expect high frequency noise in the science image convolution case
-when \(\sigma_r \gg \sigma_n\) can happen. In this case the numerical
-noise in the tails of \(\hat{P}_{mk}\) is amplified and \(\hat{K}\)
-may not converge to its high frequency constant limit value (\(F_n/\sigma_n\)).
-The practical problem with using the two-kernel ( decorrelation afterburner is exactly the same as the calculation of the ZOGY difference image 
+correctional step on the difference image. Let's consider it first
+without the pre-convolution kernel case first (\(\hat{P}_{pre}=1\)) at all
+frequencies) in \Cref{eq:K}. In this case, the matching kernel
+converges to zero, the overall expression of \(\hat{K}\) converges to
+\(F_{n}/\sigma_n\). This is the same type of solution as \(c_2\) in
+\Cref{fig:theo_Gaussians_ft} and in \Cref{fig:theo_Gaussians_img_c2}.
+When we convolve the template image, \(\sigma_r \ll \sigma_n\), we
+don't expect any significant noise even if \(\hat{P}_{mk}\) is noisy
+in its tails.
+%
+The science image convolution case is less obvious, \(\sigma_r \gg
+\sigma_n\) can prevent \(\sigma_{n}\) from becoming the dominant term
+in the denominator in \Cref{eq:K} and the numerical noise in the tails
+of \(\hat{P}_{mk}\) may remain in the correction.
+%
+If we use a pre-convolution kernel however, the overall expression becomes
+divergent in \Cref{eq:K}. Even if we don't directly hit numerical
+overflows, K cannot be applied as a separate standalone step on an
+already calculated difference image. In \Cref{eq:DaldPreMk}, we can
+see that calculating the corrected difference image (\(\hat{D}_{AL+d}\))
+is exactly the same problem as calculating the ZOGY difference image
+in \Cref{eq:Dhat}. In these expressions both the numerators and the
+denominators converge to zero which in practice result in high
+frequency noise in the tail regions of the input PSFs, pre-convolution
+and matching kernels. We face the very same numerical problems that was
+discussed in \Cref{sec:ZOGYFFT}.
 % 
 \subsection{Decorrelation afterburner normalization}
 \par To preserve the photometric scale of the AL difference image
