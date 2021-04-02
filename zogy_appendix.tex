@@ -28,14 +28,15 @@ looses significant digits and eventually rounds to exact zero. About
 \(\mathrm{epsilon}\cdot\mathrm{tiny} = 0\).
 %
 \par Underflow to zero occurs around the order of the floating-point
-\emph{tiny} value, we found, however, that this never practically happens. In
-all our practical PSF transformation cases FFT values cannot go a few orders
-below the floating-point \emph{epsilon} that is several orders higher than
-the \emph{tiny} limit (see Appendix for details). This is understandable if
-we consider that every pixel is a result of addition operations, where the
-number of terms roughly equals to the number of pixels in the image. As the
-PSFs are normalized, the zero frequency value is always 1, which
-approximately sets the exponent of these floating point calculations.
+\emph{tiny} value, we found, however, that this never practically
+happens. In all our practical PSF transformation cases FFT values
+cannot go a few orders below the floating-point \emph{epsilon} that is
+several orders higher than the \emph{tiny} limit. This is
+understandable if we consider that every pixel is a result of addition
+operations, where the number of terms roughly equals to the number of
+pixels in the image. As the PSFs are normalized, the zero frequency
+value is always 1, which approximately sets the exponent of these
+floating point values.
 %
 \par Furthermore, we usually zero pad a small PSF image to a larger image
 size that creates a window function effect in the padded image. The
