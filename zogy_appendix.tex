@@ -16,6 +16,13 @@ x &= \{x(0), x(1), ... , x(n) \},\ x(n) \in \mathbb{R}\\
 \label{eq:img_func}
 \end{align}
 %
+\subsection{Parseval theorem\label{sec:parseval}}
+The Parseval theorem states that the integral (sum) of absolute
+squares in image and frequency space are equal. In DFT form:
+\begin{equation}
+  \sum_i \abs{x_i}^2 = \frac{1}{N} \sum_k \abs{\hat{x}_k}^2\label{eq:Parseval}
+\end{equation}
+%
 \subsection{Floating point values\label{sec:floating_point}}
 The machine \emph{epsilon} is the smallest positive floating point value
 where \(1 + \varepsilon \neq 1\). This is \(\approx 1e-16\) for double

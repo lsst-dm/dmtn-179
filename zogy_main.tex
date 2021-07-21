@@ -461,14 +461,27 @@ squared kernels, and we should always perform the former.
 \par To calculate the variance plane of the difference image, we
 should calculate \(c_n\), \(c_r\) in \Cref{eq:c1N_c2R}, transform them
 back to image space, square them in image space, and convolve the
-original images' variance planes with these squared matching
-kernels. In practice, this convolution is more straightforward to be
-performed in frequency space again because these images already share
-common, full image size dimensions (the dimensions of our ZOGY
-frequency space calculations).
+original images' variance planes with these squared matching kernels
+(\Cref{eq:VarD}). In practice, this convolution is more
+straightforward to be performed in frequency space again because these
+images already share common, full image size dimensions (the
+dimensions of our ZOGY frequency space calculations).
+\begin{align}
+  V_D &= V_N \otimes \left(c_n^2\right) + V_R \otimes \left(c_r^2\right)\label{eq:VarD}\\
+  \sigma_D^2 &= \sigma_N^2 \sum c_n^2 + \sigma_R^2 \sum c_r^2\label{eq:sigmaD} 
+\end{align}
 %
-\par \Cref{eq:Shat} can also be written similarly to \Cref{eq:c1N_c2R} and
-the variance plane of S can be calculated this way as well.
+\par In the homoscedastic approximation (\Cref{eq:sigmaD}), using the
+Parseval theorem (\Cref{sec:parseval}), it can be seen that the zogy
+\(\hat{D}\) is scaled (\Cref{eq:Dhat}) so that \(\sigma_D^2 = 1\) for
+every pixel, while the flux is scaled to \(F_D\). Note that in the AL
+plus decorrelation afterburner case, the flux is preserved, and the
+noise variance is scaled to \(\sigma_n^2 / F_n^2 + \sigma_r^2
+/F_r^2\). See \Cref{eq:K,eq:KPre}.
+%
+\par \Cref{eq:Shat} can also be written similarly to \Cref{eq:c1N_c2R}
+and the variance plane of S can be calculated analogously
+(\Cref{eq:VarD}) this way as well.
 %
 \section{ZOGY and AL equivalence\label{sec:ALZOGYequiv}}
 \par The classic AL algorithm matches the reference image to the new
@@ -595,7 +608,7 @@ second step is numerically problematic as discussed in
 %
 \section{The decorrelation afterburner\label{sec:decorrab}}
 Let's consider the decorrelation afterburner first without the
-pre-convolution kernel, when (\(\hat{P}_{pre}=1\)) at all frequencies)
+pre-convolution kernel, when (\(\hat{P}_{pre}=1\)) at all frequencies
 in \Cref{eq:K}.
 %
 \par Assuming a Gaussian matching kernel (\(\hat{P}_{mk}\)) that
@@ -634,6 +647,125 @@ of the input Gaussians (image PSFs, pre-convolution and matching
 kernels). We face the very same numerical problems that was discussed
 in \Cref{sec:ZOGYFFT}.
 % 
+\subsection{Decorrelation afterburner with pre-convolution\label{sec:decorr_preconv}}
+%
+\par We saw that the decorrelation afterburner of \Cref{eq:K} is
+problematic if we use a pre-convolution kernel. In this form the
+decorrelation afterburner wants to recover the proper difference
+image, inverting the pre-convolution operation completely.
+%
+\par Recall that pre-convolution is a practical way to ensure that the
+science image PSF is wider than our template PSF. We also know that if
+we choose to correlate an image with its own
+PSF\footnote{Pre-convolution with the flipped PSF in image space;
+  multiplication with complex conjugate in frequency space (e.g.\
+  \Cref{eq:Shat}).}, under the independent Gaussian noise model
+assumptions, we get a detection likelihood image.
+%
+\par We show here that we can apply a form of the decorrelation
+afterburner in the pre-convolution case if we pre-convolve the science
+image with its own PSF. This form of the decorrelation afterburner
+does not invert the pre-convolution operation, in this sense it does
+not do noise decorrelation any more. Rather it corrects the
+pre-convoled and AL PSF matched likelhood difference image directly
+and results in the equivalent of the zogy score image as an optimal
+detection statistics in the case when both the science and template
+images have noise.
+%
+We can rewrite \Cref{eq:S}:
+\begin{align}
+  \hat{S} &= 
+            \frac{\overline{\hat{P}_n} \frac{\hat{N}}{F_n} -
+            \frac{\abs{\hat{P}_n}^2}{\hat{P}_r} \frac{\hat{R}}{F_r} }
+            % denom
+            { \frac{\sigma_n^2}{F_n^2} +
+            \frac{\sigma_r^2}{F_r^2}
+            \frac{\frac{\abs{\hat{P_n}}^2}{\hat{P}_r}}
+            {\overline{\hat{P}_r}}         
+            } =
+            \frac{\overline{\hat{P}_n} \frac{\hat{N}}{F_n} -
+            \frac{\abs{\hat{P}_n}^2}{\hat{P}_r} \frac{\hat{R}}{F_r} }
+            % denom
+            { \frac{\sigma_n^2}{F_n^2} +
+            \frac{\sigma_r^2}{F_r^2}
+            \frac{\abs{\hat{P}_{mk}}^2}{\abs{\hat{P}_{n}}^2}
+            } = 
+            % two terms
+            \underbrace{\left(
+            \overline{\hat{P}_n} \frac{\hat{N}}{F_n} -
+            \frac{\abs{\hat{P}_n}^2}{\hat{P}_r} \frac{\hat{R}}{F_r}
+            \right)}_{\textrm{pre-convolved AL}} \cdot
+            % denom
+            \frac{1}
+            { \frac{\sigma_n^2}{F_n^2} +
+            \frac{\sigma_r^2}{F_r^2}
+            \frac{\abs{\hat{P}_{mk}}^2}{\abs{\hat{P}_{n}}^2}
+            }
+            \label{eq:SPre}\\
+  \hat{P}_{mk} &= \frac{\abs{\hat{P_n}}^2}{\hat{P}_r} \label{eq:Smk}\\
+  \hat{S} &= \hat{c}_{sn} \hat{N} - \hat{c}_{sr}\hat{R} =
+            \frac{\frac{\overline{\hat{P}_n}}{ F_n} }
+            % denom
+            { \frac{\sigma_n^2}{F_n^2} +
+            \frac{\sigma_r^2}{F_r^2}
+            \frac{\abs{\hat{P}_{mk}}^2}{\abs{\hat{P}_{n}}^2}
+            } \hat{N}
+            -
+            \frac{
+            \frac{\abs{\hat{P}_n}^2}{\hat{P}_rF_r} }
+            % denom
+            { \frac{\sigma_n^2}{F_n^2} +
+            \frac{\sigma_r^2}{F_r^2}
+            \frac{\abs{\hat{P}_{mk}}^2}{\abs{\hat{P}_{n}}^2}
+            } \hat{R}\label{eq:Scncr}
+\end{align}
+%
+\par In \Cref{eq:SPre}, the first term in the numerator is the PSF
+pre-convolved science image that now has a PSF of
+\(\abs{\hat{P}_n}^2\), and the theoretical PSF matching kernel is
+written in \Cref{eq:Smk}. We use the matching kernel to express the
+correction in \Cref{eq:SPre} on the right side. Compared to the
+original decorrelation afterburner expression, the correction is
+squared and the correction with the matching kernel is deconvolved
+with the pre-convolution kernel.
+%
+\par Let's consider the convergence properties towards high
+frequencies in case of Gaussian PSFs. The numerator of this expression
+always goes to zero while the denominator never goes to zero,
+irrespectively of the widths of \(\hat{P}_{mk}\) and
+\(\hat{P}_{n}\). As such, \(\hat{S}\) always goes to zero.
+%
+\par If we use pre-convolution to avoid the AL deconvolution case, it
+is guaranteed that the matching kernel solution will be narrower in
+image space than the PSF of the science image. In frequency space, the
+relation is the opposite, and the denominator of \Cref{eq:SPre} should
+actually diverge, making the overall zero convergence faster.
+%
+\par Note that the zero convergence property of \(\hat{S}\) is kept
+even if the convergence properties are numerically lost in the second
+term of the denominator at high frequencies. Therefore we do not
+expect \emph{worse} high frequency noise to appear in our ``afterburned''
+likelihood/score image result than it would be in a simple frequency
+space PSF convolution operation.
+%
+\par We emphasize that while we can apply this correction on the
+already calculated pre-convolved AL likelihood difference image, we
+cannot do it on its variance plane. Because the noise in the score
+image is not white, we cannot easily estimate the noise level even in
+the homoscedastic noise model case. Instead, we need to follow the
+considerations of \Cref{sec:varplane} for the variance plane
+calculation and express \(\hat{S}\) with the overall coefficients of
+\(\hat{N}\) and \(\hat{R}\) as shown in \Cref{eq:Scncr}. Recall, we
+transform \(\hat{c}_{sn}\) and \(\hat{c}_{sr}\) back to image space,
+square them in image space, and convolve the original images' variance
+planes with these squared matching kernels (\Cref{eq:VarD}). In the
+homoscedastic approximation, we multiply \(\sigma_n^2\) and
+\(\sigma_r^2\) with the sum of squares (\Cref{eq:sigmaD}), but we
+still need to calculate \(c_{sn}\) and \(c_{sr}\). In this
+approximation, the inverse FFT of \(\hat{c}_{sn}\) and
+\(\hat{c}_{sr}\) can be spared and the sum can be calculated directly
+in frequency space (Parseval theorem, \Cref{sec:parseval}).
+%
 \subsection{Decorrelation afterburner normalization}
 \par The classic AL method can be applied to images without
 considering their photometric scaling factors (\(F_n, F_r\)). In this
